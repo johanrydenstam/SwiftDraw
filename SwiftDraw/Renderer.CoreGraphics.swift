@@ -34,7 +34,7 @@ import Foundation
 import CoreText
 #if os(macOS)
 import AppKit
-#elseif os(iOS)
+#elseif os(iOS) || os(tvOS)
 import UIKit
 #endif
 
@@ -287,7 +287,7 @@ struct CGProvider: RendererTypeProvider {
 //TODO: replace with CG implementation
 private extension CGImage {
     static func from(data: Data) -> CGImage? {
-#if os(iOS)
+#if os(iOS) || os(tvOS)
         return UIImage(data: data)?.cgImage
 #elseif os(macOS)
         guard let image = NSImage(data: data) else { return nil }
