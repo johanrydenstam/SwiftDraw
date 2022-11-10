@@ -125,10 +125,22 @@ extension DOM.SVG {
         return try parser.parseSVG(element)
     }
 
-    static func parse(data: Data, options: XMLParser.Options = .skipInvalidElements) throws -> DOM.SVG {
+    static func parse(data: Data, options: XMLParser.Options = .skipInvalidElements, fillColor: CGColor?) throws -> DOM.SVG {
+        var style: [DOM.StyleSheet] = []
+        if let compontents = fillColor?.components {
+            var stylesheet = DOM.StyleSheet()
+            let red = Float(compontents[0])
+            let green = Float(compontents[1])
+            let blue = Float(compontents[2])
+            let color = DOM.Color.rgbf(red, green, blue)
+            var attr = DOM.PresentationAttributes()
+            attr.color = color
+            stylesheet.attributes = [.element("SVG") : attr]
+            style.append(stylesheet)
+        }
         let element = try XML.SAXParser.parse(data: data)
         let parser = XMLParser(options: options)
-        return try parser.parseSVG(element)
+        return try parser.parseSVG(element, style: style)
     }
 }
 
@@ -152,8 +164,8 @@ public extension SVG {
         self.init(fileURL: url, options: options)
     }
 
-    convenience init?(data: Data, options: SVG.Options = .default) {
-        guard let svg = try? DOM.SVG.parse(data: data) else {
+    convenience init?(data: Data, options: SVG.Options = .default, fillColor: CGColor? = nil) {
+        guard let svg = try? DOM.SVG.parse(data: data, fillColor: fillColor) else {
             return nil
         }
 

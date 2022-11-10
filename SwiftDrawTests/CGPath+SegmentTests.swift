@@ -31,6 +31,7 @@
 
 import XCTest
 @testable import SwiftDraw
+
 #if canImport(CoreGraphics)
 import CoreGraphics
 
