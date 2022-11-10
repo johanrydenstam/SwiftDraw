@@ -35,9 +35,12 @@ import Foundation
 
 public extension CGContext {
 
-    func draw(_ image: SVG, in rect: CGRect? = nil)  {
+    func draw(_ image: SVG, fillColor: CGColor? = nil, in rect: CGRect? = nil)  {
         let defaultRect = CGRect(x: 0, y: 0, width: image.size.width, height: image.size.height)
         let renderer = CGRenderer(context: self)
+        if let fillColor {
+            renderer.setFill(color: fillColor)
+        }
 
         guard let rect = rect, rect != defaultRect else {
             renderer.perform(image.commands)

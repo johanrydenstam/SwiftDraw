@@ -68,8 +68,8 @@ public extension UIImage {
 }
 
 public extension SVG {
-    func rasterize() -> UIImage {
-        return rasterize(with: size)
+    func rasterize(fillColor: UIColor? = nil) -> UIImage {
+        return rasterize(with: size, fillColor: fillColor)
     }
 
     private func makeFormat() -> UIGraphicsImageRendererFormat {
@@ -83,7 +83,7 @@ public extension SVG {
         return f
     }
 
-    func rasterize(with size: CGSize? = nil, scale: CGFloat = 0, insets: UIEdgeInsets = .zero) -> UIImage {
+    func rasterize(with size: CGSize? = nil, scale: CGFloat = 0, fillColor: UIColor? = nil, insets: UIEdgeInsets = .zero) -> UIImage {
         let insets = Insets(top: insets.top, left: insets.left, bottom: insets.bottom, right: insets.right)
         let (bounds, pixelsWide, pixelsHigh) = makeBounds(size: size, scale: 1, insets: insets)
         let f = makeFormat()
@@ -91,12 +91,12 @@ public extension SVG {
         f.opaque = false
         let r = UIGraphicsImageRenderer(size: CGSize(width: pixelsWide, height: pixelsHigh), format: f)
         return r.image{
-            $0.cgContext.draw(self, in: bounds)
+            $0.cgContext.draw(self, fillColor: fillColor?.cgColor, in: bounds)
         }
     }
 
     func pngData(size: CGSize? = nil, scale: CGFloat = 0, insets: UIEdgeInsets = .zero) throws -> Data {
-        let image = rasterize(with: size, scale: scale, insets: insets)
+        let image = rasterize(with: size, scale: scale, fillColor: nil, insets: insets)
         guard let data = image.pngData() else {
             throw Error("Failed to create png data")
         }
@@ -104,7 +104,7 @@ public extension SVG {
     }
 
     func jpegData(size: CGSize? = nil, scale: CGFloat = 0, compressionQuality quality: CGFloat = 1, insets: UIEdgeInsets = .zero) throws -> Data {
-        let image = rasterize(with: size, scale: scale, insets: insets)
+        let image = rasterize(with: size, scale: scale, fillColor: nil, insets: insets)
         guard let data = image.jpegData(compressionQuality: quality) else {
             throw Error("Failed to create jpeg data")
         }
