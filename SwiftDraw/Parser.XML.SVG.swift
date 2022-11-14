@@ -31,7 +31,7 @@
 
 extension XMLParser {
 
-    func parseSVG(_ e: XML.Element, style: [DOM.StyleSheet] = []) throws -> DOM.SVG {
+    func parseSVG(_ e: XML.Element, fill: DOM.Fill? = nil) throws -> DOM.SVG {
         guard e.name == "svg" else {
             throw Error.invalid
         }
@@ -60,9 +60,11 @@ extension XMLParser {
         svg.viewBox = try parseViewBox(try att.parseString("viewBox"))
 
         svg.defs = try parseSVGDefs(e)
-        svg.styles = parseStyleSheetElements(within: e) + style
+        svg.styles = parseStyleSheetElements(within: e)
 
-        svg.attributes = try parsePresentationAttributes(att)
+        var attributes = try parsePresentationAttributes(att)
+        attributes.fill = fill ?? attributes.fill
+        svg.attributes = attributes
 
         return svg
     }

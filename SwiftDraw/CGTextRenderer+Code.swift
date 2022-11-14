@@ -67,7 +67,7 @@ public extension CGTextRenderer {
     }
 
     static func render(data: Data, options: SVG.Options, api: CGTextRenderer.API, precision: Int) throws -> String {
-        let svg = try DOM.SVG.parse(data: data, fillColor: nil)
+        let svg = try DOM.SVG.parse(data: data, hexColor: nil)
         let size = makeSize(svg: svg, size: nil)
         return cgCodeText(api: api,
                           name: "Image",

@@ -76,6 +76,8 @@ public final class SVG: NSObject {
 @available(*, deprecated, renamed: "SVG")
 public typealias Image = SVG
 
+public typealias HexColor = (UInt8, UInt8, UInt8)
+
 #else
 
 public final class SVG: NSObject {
@@ -125,22 +127,18 @@ extension DOM.SVG {
         return try parser.parseSVG(element)
     }
 
-    static func parse(data: Data, options: XMLParser.Options = .skipInvalidElements, fillColor: CGColor?) throws -> DOM.SVG {
-        var style: [DOM.StyleSheet] = []
-        if let compontents = fillColor?.components {
-            var stylesheet = DOM.StyleSheet()
-            let red = Float(compontents[0])
-            let green = Float(compontents[1])
-            let blue = Float(compontents[2])
-            let color = DOM.Color.rgbf(red, green, blue)
-            var attr = DOM.PresentationAttributes()
-            attr.color = color
-            stylesheet.attributes = [.element("SVG") : attr]
-            style.append(stylesheet)
+    static func parse(data: Data, options: XMLParser.Options = .skipInvalidElements, hexColor: HexColor?) throws -> DOM.SVG {
+
+        let fillColor: DOM.Fill?
+        if let hexColor {
+            fillColor = .color(.hex(hexColor.0, hexColor.1, hexColor.2))
+        } else {
+            fillColor = nil
         }
+
         let element = try XML.SAXParser.parse(data: data)
         let parser = XMLParser(options: options)
-        return try parser.parseSVG(element, style: style)
+        return try parser.parseSVG(element, fill: fillColor)
     }
 }
 
@@ -164,8 +162,8 @@ public extension SVG {
         self.init(fileURL: url, options: options)
     }
 
-    convenience init?(data: Data, options: SVG.Options = .default, fillColor: CGColor? = nil) {
-        guard let svg = try? DOM.SVG.parse(data: data, fillColor: fillColor) else {
+    convenience init?(data: Data, options: SVG.Options = .default, hexColor: HexColor? = nil) {
+        guard let svg = try? DOM.SVG.parse(data: data, hexColor: hexColor) else {
             return nil
         }
 
